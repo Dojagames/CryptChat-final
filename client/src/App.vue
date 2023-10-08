@@ -127,7 +127,7 @@ export default {
 
 
             //check if users is already in db
-            if(this.users.some(e => e == _user)){
+            if(this.users.some(e => e.name == _user.name)){
                 this.view = "chat";
                 this.currentChat = _user.name;
                 return;
@@ -141,6 +141,7 @@ export default {
             console.log(this.chats);
 
             localStorage.setItem("users", JSON.stringify(this.users));
+            localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
             this.currentChat = _user.name;
             this.view = "chat";
         });
@@ -148,12 +149,16 @@ export default {
         socket.on("getMsg", (msg) => {
             const _user = msg.from;
             const localuser = this.chats.filter(e => e.name == _user);
-            console.log(_user);
+            console.log(localuser);
             if(localuser.length > 0){
-                this.chats.filter(e => e.name = _user)[0].chat.push(msg.msg);
+                console.log(this.chats.filter(e => e.name == _user)[0]);
+                this.chats.filter(e => e.name == _user)[0].chat.push(msg.msg);
+                localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
             } else {
                 this.users.push({name: _user, key: null});
                 this.chats.push({name: _user, chat: [msg.msg]});
+                localStorage.setItem("users", JSON.stringify(this.users));
+                localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
             }
         });
 
@@ -166,8 +171,21 @@ export default {
 
         const _users = localStorage.getItem("users");
         if(_users){
-            //this.users = JSON.parse(this.users);
+            this.users = JSON.parse(_users);
+            this.users.forEach(e => {
+                console.log(e);
+                let _tempUser = localStorage.getItem(e.name);
+                if(_tempUser){
+                    _tempUser = JSON.parse(_tempUser);
+                    this.chats.push({name: e.name, chat: _tempUser});
+                }
+            });
+
+            console.log(this.chats);
         }
+
+
+
 
         const tempToken = sessionStorage.getItem("tempToken");
         if(!tempToken){
