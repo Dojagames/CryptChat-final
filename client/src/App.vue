@@ -21,6 +21,12 @@ export default {
 
             msgto: "",
             msg: "",
+
+            privateKey: undefined,
+
+            users: [],
+            currentChat: undefined,
+            chats: [],
         }
     },
     components: {
@@ -62,8 +68,12 @@ export default {
             this.view = _view;
         },
 
+        searchUser(_username){
+            socket.emit("getUser", (_username));
+        },
+
         sendMsg(){
-            socket.emit("sendMsg", ({to: this.msgto, msg: this.msg}));
+            socket.emit("sendMsg", ({to: this.currentChat, msg: this.msg}));
         },
         
     },
@@ -86,7 +96,9 @@ export default {
             alert("alreadyLoggedIn");
         });
 
-        socket.on("registered", () => {
+        socket.on("registered", (key) => {
+            this.privateKey = key;
+            localStorage.setItem("pKey", key);
             this.view = "main";
         });
 
@@ -107,12 +119,56 @@ export default {
             localStorage.setItem("token", token);
         });
 
+        socket.on("Userfound", (_user) => {
+            if(_user == null) {
+                alert("user not found");
+                return;
+            }
+
+
+            //check if users is already in db
+            if(this.users.some(e => e == _user)){
+                this.view = "chat";
+                this.currentChat = _user.name;
+                return;
+            }
+
+           
+
+            this.users.push(_user);
+            this.chats.push({name: _user.name, chat: []});
+
+            console.log(this.chats);
+
+            localStorage.setItem("users", JSON.stringify(this.users));
+            this.currentChat = _user.name;
+            this.view = "chat";
+        });
+
         socket.on("getMsg", (msg) => {
-            alert(msg.from + " : " + msg.msg);
+            const _user = msg.from;
+            const localuser = this.chats.filter(e => e.name == _user);
+            console.log(_user);
+            if(localuser.length > 0){
+                this.chats.filter(e => e.name = _user)[0].chat.push(msg.msg);
+            } else {
+                this.users.push({name: _user, key: null});
+                this.chats.push({name: _user, chat: [msg.msg]});
+            }
         });
 
     },
     mounted(){
+        const privateKey = localStorage.getItem("pKey");
+        if(privateKey) {
+            this.privateKey = privateKey;
+        }
+
+        const _users = localStorage.getItem("users");
+        if(_users){
+            //this.users = JSON.parse(this.users);
+        }
+
         const tempToken = sessionStorage.getItem("tempToken");
         if(!tempToken){
             this.refreshToken = localStorage.getItem("token");
@@ -129,13 +185,27 @@ export default {
     watch: {
         
     },
+    computed: {
+        currentChatMsgs(){
+            console.log(this.chats.filter(e => e.name == this.currentChat));
+            const chat = this.chats.filter(e => e.name == this.currentChat);
+            if(chat.length > 0){
+                const chatMsgs = chat[0].chat;
+                return chatMsgs;
+            }
+           else {
+            alert("newChat?");
+            return [];
+           }
+        },
+    }
 
 }
 </script>
 
 <template>
     
-    <div id="login" v-if="view === 'login'">
+    <div class="login" v-if="view === 'login'">
         <h3>Login</h3>
         <input type="text" placeholder="username" v-model="loginInput" style="background-color: transparent;"><br>
         <input type="password" placeholder="password" v-model="loginPassword" style="background-color: transparent;"><br>
@@ -145,7 +215,7 @@ export default {
         <button @click="changeView('register')">Register?</button>
     </div>
 
-    <div id="register" v-if="view === 'register'">
+    <div class="login" v-if="view === 'register'">
         <h3>Register</h3>
         <input type="text" placeholder="username" v-model="registerUser" style="background-color: transparent;"><br><br>
 
@@ -158,19 +228,52 @@ export default {
     </div>
 
     <div id="main" v-if="view === 'main'">
-        <button @click="logOut()">log out</button>
-        <div id="window" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center;">
+        <button @click="logOut()" style="background-color: transparent;">log out</button>
+        
+        <div id="userlist">
+            <div class="userInList" v-for="user in users">
+                {{ user.name }}
+                <div id="chat">
+                    <div class="msg" v-for="msgs in chats[user.name]">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <button @click="changeView('search')" style="position: absolute; right: 15px; bottom: 15px; background-color: transparent; font-size: x-large;">add User</button>
+        
+        <!-- <div id="window" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center;">
             <input type="text" style="background-color: transparent;" v-model="msgto" placeholder="send to"><br>
             <input type="text" style="background-color: transparent;" v-model="msg" placeholder="msg"><br>
             <button @click="sendMsg()">send</button>
-        </div>
+        </div> -->
         
+    </div>
+
+    <div id="addUser" v-if="view ==='search'">
+        <input type="text" style="background-color: transparent;" v-model="msgto" placeholder="username"><br>
+        <button @click="searchUser(msgto)">Search</button>
+    </div>
+
+    <div id="chat" v-if="view === 'chat'">
+        <h1>{{ this.currentChat }}</h1>
+
+        <div id="chatInterface">
+            <div class="msg" v-for="msg in currentChatMsgs">
+                {{ msg }}
+            </div>
+            <input type="text" style="background-color: transparent;" v-model="msg" placeholder="msg"><br>
+            <button @click="sendMsg()">send</button>
+        </div>
     </div>
 
 </template>
 
 <style scoped>
-    #login{
+    .login{
         position: absolute;
         left: 50%;
         top: 50%;
@@ -182,5 +285,12 @@ export default {
         background-color: rgba(255, 0, 0, 0.178);
 
         text-align: center;
+    }
+
+    #addUser{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
     }
 </style>
