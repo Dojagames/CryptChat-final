@@ -138,7 +138,6 @@ export default {
             this.users.push(_user);
             this.chats.push({name: _user.name, chat: []});
 
-            console.log(this.chats);
 
             localStorage.setItem("users", JSON.stringify(this.users));
             localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
@@ -149,9 +148,8 @@ export default {
         socket.on("getMsg", (msg) => {
             const _user = msg.from;
             const localuser = this.chats.filter(e => e.name == _user);
-            console.log(localuser);
+
             if(localuser.length > 0){
-                console.log(this.chats.filter(e => e.name == _user)[0]);
                 this.chats.filter(e => e.name == _user)[0].chat.push(msg.msg);
                 localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
             } else {
@@ -173,15 +171,12 @@ export default {
         if(_users){
             this.users = JSON.parse(_users);
             this.users.forEach(e => {
-                console.log(e);
                 let _tempUser = localStorage.getItem(e.name);
                 if(_tempUser){
                     _tempUser = JSON.parse(_tempUser);
                     this.chats.push({name: e.name, chat: _tempUser});
                 }
             });
-
-            console.log(this.chats);
         }
 
 
@@ -205,7 +200,6 @@ export default {
     },
     computed: {
         currentChatMsgs(){
-            console.log(this.chats.filter(e => e.name == this.currentChat));
             const chat = this.chats.filter(e => e.name == this.currentChat);
             if(chat.length > 0){
                 const chatMsgs = chat[0].chat;
@@ -249,14 +243,8 @@ export default {
         <button @click="logOut()" style="background-color: transparent;">log out</button>
         
         <div id="userlist">
-            <div class="userInList" v-for="user in users">
+            <div class="userInList" v-for="user in users" @click="view = 'chat'; currentChat = user.name">
                 {{ user.name }}
-                <div id="chat">
-                    <div class="msg" v-for="msgs in chats[user.name]">
-
-                    </div>
-                </div>
-
             </div>
         </div>
 
