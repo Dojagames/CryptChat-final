@@ -59,9 +59,9 @@ export default {
 
         logOut(){
             socket.emit("logout");
-            // localStorage.removeItem("token");
-            // sessionStorage.removeItem("tempToken");
-            // this.view = "login";
+            localStorage.removeItem("token");
+            sessionStorage.removeItem("tempToken");
+            this.view = "login";
         },
 
         changeView(_view){
@@ -72,8 +72,13 @@ export default {
             socket.emit("getUser", (_username));
         },
 
-        sendMsg(){
-            socket.emit("sendMsg", ({to: this.currentChat, msg: this.msg}));
+        sendMsg(_msg){
+            var bytes = window.btoa(_msg);
+
+            const pKey = this.currentChat.key;
+            var encrypted = pKey.encrypt(bytes, "RSA-OAEP");
+            const _sendMsg = JSON.stringify(encrypted);
+            socket.emit("sendMsg", ({to: this.currentChat.name, msg: _sendMsg}));
         },
         
     },
@@ -83,7 +88,7 @@ export default {
         });
 
         socket.on("cantRegister", (_cause) => {
-           alert("test");
+           alert(_cause);
             //show cant register
         });
 
@@ -97,8 +102,11 @@ export default {
         });
 
         socket.on("registered", (key) => {
-            this.privateKey = key;
-            localStorage.setItem("pKey", key);
+            var pki = forge.pki;
+            var privateKey = pki.privateKeyFromPem(key);
+            this.privateKey = privateKey;
+
+            localStorage.setItem("pKey", JSON.stringify(privateKey));
             this.view = "main";
         });
 
@@ -125,11 +133,14 @@ export default {
                 return;
             }
 
-
+            var pki = forge.pki;
+            var publicKey = pki.publicKeyFromPem(_user.key);
+            _user.key = publicKey;
+           
             //check if users is already in db
             if(this.users.some(e => e.name == _user.name)){
                 this.view = "chat";
-                this.currentChat = _user.name;
+                this.currentChat = _user;
                 return;
             }
 
@@ -141,20 +152,21 @@ export default {
 
             localStorage.setItem("users", JSON.stringify(this.users));
             localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
-            this.currentChat = _user.name;
+            this.currentChat = _user;
             this.view = "chat";
         });
 
         socket.on("getMsg", (msg) => {
             const _user = msg.from;
+            const _msg = this.privateKey.decrypt(JSON.parse(msg), "RSA-OAEP");
             const localuser = this.chats.filter(e => e.name == _user);
 
             if(localuser.length > 0){
-                this.chats.filter(e => e.name == _user)[0].chat.push(msg.msg);
+                this.chats.filter(e => e.name == _user)[0].chat.push(_msg);
                 localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
             } else {
                 this.users.push({name: _user, key: null});
-                this.chats.push({name: _user, chat: [msg.msg]});
+                this.chats.push({name: _user, chat: [_msg]});
                 localStorage.setItem("users", JSON.stringify(this.users));
                 localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
             }
@@ -164,7 +176,7 @@ export default {
     mounted(){
         const privateKey = localStorage.getItem("pKey");
         if(privateKey) {
-            this.privateKey = privateKey;
+            this.privateKey = JSON.parse(privateKey);
         }
 
         const _users = localStorage.getItem("users");
@@ -200,7 +212,7 @@ export default {
     },
     computed: {
         currentChatMsgs(){
-            const chat = this.chats.filter(e => e.name == this.currentChat);
+            const chat = this.chats.filter(e => e.name == this.currentChat.name);
             if(chat.length > 0){
                 const chatMsgs = chat[0].chat;
                 return chatMsgs;
@@ -243,7 +255,7 @@ export default {
         <button @click="logOut()" style="background-color: transparent;">log out</button>
         
         <div id="userlist">
-            <div class="userInList" v-for="user in users" @click="view = 'chat'; currentChat = user.name">
+            <div class="userInList" v-for="user in users" @click="view = 'chat'; currentChat.name = user.name">
                 {{ user.name }}
             </div>
         </div>
@@ -265,14 +277,14 @@ export default {
     </div>
 
     <div id="chat" v-if="view === 'chat'">
-        <h1>{{ this.currentChat }}</h1>
+        <h1>{{ this.currentChat.name }}</h1>
 
         <div id="chatInterface">
             <div class="msg" v-for="msg in currentChatMsgs">
                 {{ msg }}
             </div>
             <input type="text" style="background-color: transparent;" v-model="msg" placeholder="msg"><br>
-            <button @click="sendMsg()">send</button>
+            <button @click="sendMsg(msg)">send</button>
         </div>
     </div>
 
