@@ -80,7 +80,35 @@ export default {
             var encrypted = publicKey.encrypt(bytes, "RSA-OAEP");
             var _sendMsg = JSON.stringify(encrypted);
   
-            socket.emit("sendMsg", ({to: _user.name, msg: _sendMsg}));
+            socket.emit("sendMsg", ({to: _user.name, msg: _sendMsg, time: Date.now()}));
+        },
+
+        handleIncommingMsg(_msg, _from, _time){
+            const localuser = this.users.filter(e => e.name == _from);
+            const chatUser = this.chats.filter(e => e.name == _from);
+
+            if(!localuser.length > 0){
+                this.users.push({name: _from, key: null});
+                localStorage.setItem("users", JSON.stringify(this.users));
+
+                let _tempUser = localStorage.getItem(_from); // if user list gets deleted, this restores the chat
+                if(_tempUser){
+                    _tempUser = JSON.parse(_tempUser);
+                    this.chats.push({name: _from, chat: _tempUser});
+                }
+            }
+
+            if(chatUser.length > 0 ){
+                this.chats.filter(e => e.name == _from)[0].chat.push([_msg, _time]);
+                localStorage.setItem(_from, JSON.stringify(this.chats.filter(e => e.name == _from)[0].chat));
+                
+            } else {
+                socket.emit("getPublicKeyFromNewUser", (_from));
+                this.chats.push({name: _from, chat: [[_msg, _time]]});
+                localStorage.setItem(_from, JSON.stringify(this.chats.filter(e => e.name == _from)[0].chat));
+            }
+
+            
         },
         
     },
@@ -96,6 +124,9 @@ export default {
 
         socket.on("loggedIn", (token) => {
             sessionStorage.setItem("tempToken", token);
+
+            socket.emit("getAbsentMsgs");
+
             this.view = "main";
         });
 
@@ -170,19 +201,17 @@ export default {
         socket.on("getMsg", (msg) => {
             const _user = msg.from;
             const _msg = window.atob(this.privateKey.decrypt(JSON.parse(msg.msg), "RSA-OAEP"));
-            const localuser = this.chats.filter(e => e.name == _user);
+            
+            this.handleIncommingMsg(_msg, _user, msg.time);
+        });
 
-            if(localuser.length > 0){
-                this.chats.filter(e => e.name == _user)[0].chat.push(_msg);
-                localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
-            } else {
-                socket.emit("getPublicKeyFromNewUser", (_user));
+        socket.on("sendAbsendMsgs", (_msgs) => {
+            _msgs.forEach(e => {
+                const _user = e.from;
+                const _msg = window.atob(this.privateKey.decrypt(JSON.parse(e.msg), "RSA-OAEP"));
 
-                this.users.push({name: _user, key: null});
-                this.chats.push({name: _user, chat: [_msg]});
-                localStorage.setItem("users", JSON.stringify(this.users));
-                localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
-            }
+                this.handleIncommingMsg(_msg, _user, e.time);
+            });
         });
 
     },
@@ -297,7 +326,7 @@ export default {
 
         <div id="chatInterface">
             <div class="msg" v-for="msg in currentChatMsgs">
-                {{ msg }}
+                {{ msg[0] }}
             </div>
             <input type="text" style="background-color: transparent;" v-model="msg" placeholder="msg"><br>
             <button @click="sendMsg(msg, this.currentChat)">send</button>

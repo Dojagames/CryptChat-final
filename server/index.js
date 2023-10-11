@@ -194,7 +194,6 @@ io.on('connection', (socket)=> {
     });
 
     socket.on("getPublicKeyFromNewUser", async (_username) => {
-        console.log(_username);
         let keyResult = await keyCollection.findOne({ "_id": _username });
         
         if (keyResult){
@@ -210,13 +209,32 @@ io.on('connection', (socket)=> {
     });
 
     //msgs
-    socket.on("sendMsg", (_data) =>{
+    socket.on("sendMsg", async (_data) =>{
+        const _name = Users.filter(e => e.id == socket.id)[0].name;
+
         if(Users.some(e => e.name == _data.to)){
             const _id = Users.filter(e => e.name == _data.to)[0].id;
-            const _name = Users.filter(e => e.id == socket.id)[0].name;
-            io.to(_id).emit("getMsg", ({from: _name, msg: _data.msg}));
+            io.to(_id).emit("getMsg", ({from: _name, msg: _data.msg, time: _data.time}));
+        } else {
+            let msgResult = await msgCollection.findOne({ "_id": _data.to });
+            if(msgResult){
+                msgCollection.updateOne({"_id": _data.to}, {$push: { msg: {from: _name, msg: _data.msg, time: _data.time}}})
+            } else {
+                await msgCollection.insertOne({ "_id": _data.to, "msg": [{from: _name, msg: _data.msg, time: _data.time}]});
+            }
         }
     })
+
+    socket.on("getAbsentMsgs", async () => {
+        const _name = Users.filter(e => e.id == socket.id)[0].name;
+        let msgResult = await msgCollection.findOne({ "_id": _name });
+
+        if(msgResult){
+            socket.emit("sendAbsendMsgs", (msgResult.msg));
+            await msgCollection.deleteOne({ "_id": _name});
+        }
+
+    });
 });
 
 
