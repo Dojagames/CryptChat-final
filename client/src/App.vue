@@ -25,7 +25,7 @@ export default {
             privateKey: undefined,
 
             users: [],
-            currentChat: undefined,
+            currentChat: {name: undefined, key: undefined},
             chats: [],
         }
     },
@@ -72,13 +72,15 @@ export default {
             socket.emit("getUser", (_username));
         },
 
-        sendMsg(_msg){
-            var bytes = window.btoa(_msg);
+        sendMsg(_msg, _user){
+            var pki = forge.pki;
+            var publicKey = pki.publicKeyFromPem(_user.key);
 
-            const pKey = this.currentChat.key;
-            var encrypted = pKey.encrypt(bytes, "RSA-OAEP");
-            const _sendMsg = JSON.stringify(encrypted);
-            socket.emit("sendMsg", ({to: this.currentChat.name, msg: _sendMsg}));
+            var bytes = window.btoa(_msg);
+            var encrypted = publicKey.encrypt(bytes, "RSA-OAEP");
+            var _sendMsg = JSON.stringify(encrypted);
+  
+            socket.emit("sendMsg", ({to: _user.name, msg: _sendMsg}));
         },
         
     },
@@ -106,7 +108,7 @@ export default {
             var privateKey = pki.privateKeyFromPem(key);
             this.privateKey = privateKey;
 
-            localStorage.setItem("pKey", JSON.stringify(privateKey));
+            localStorage.setItem("pKey", JSON.stringify(key));
             this.view = "main";
         });
 
@@ -133,9 +135,7 @@ export default {
                 return;
             }
 
-            var pki = forge.pki;
-            var publicKey = pki.publicKeyFromPem(_user.key);
-            _user.key = publicKey;
+           
            
             //check if users is already in db
             if(this.users.some(e => e.name == _user.name)){
@@ -151,14 +151,14 @@ export default {
 
 
             localStorage.setItem("users", JSON.stringify(this.users));
-            localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
+            localStorage.setItem(_user.name, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
             this.currentChat = _user;
             this.view = "chat";
         });
 
         socket.on("getMsg", (msg) => {
             const _user = msg.from;
-            const _msg = this.privateKey.decrypt(JSON.parse(msg), "RSA-OAEP");
+            const _msg = window.atob(this.privateKey.decrypt(JSON.parse(msg.msg), "RSA-OAEP"));
             const localuser = this.chats.filter(e => e.name == _user);
 
             if(localuser.length > 0){
@@ -176,7 +176,11 @@ export default {
     mounted(){
         const privateKey = localStorage.getItem("pKey");
         if(privateKey) {
-            this.privateKey = JSON.parse(privateKey);
+            var pki = forge.pki;
+
+            const tempkey = JSON.parse(privateKey);
+            var pKey = pki.privateKeyFromPem(tempkey);
+            this.privateKey = pKey;
         }
 
         const _users = localStorage.getItem("users");
@@ -255,7 +259,7 @@ export default {
         <button @click="logOut()" style="background-color: transparent;">log out</button>
         
         <div id="userlist">
-            <div class="userInList" v-for="user in users" @click="view = 'chat'; currentChat.name = user.name">
+            <div class="userInList" v-for="user in users" @click="currentChat = user; view = 'chat'; ">
                 {{ user.name }}
             </div>
         </div>
@@ -284,7 +288,7 @@ export default {
                 {{ msg }}
             </div>
             <input type="text" style="background-color: transparent;" v-model="msg" placeholder="msg"><br>
-            <button @click="sendMsg(msg)">send</button>
+            <button @click="sendMsg(msg, this.currentChat)">send</button>
         </div>
     </div>
 
