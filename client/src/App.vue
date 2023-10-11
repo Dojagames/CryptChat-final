@@ -326,7 +326,7 @@ export default {
 
         <div id="chatInterface">
             <div class="msg" v-for="msg in currentChatMsgs">
-                {{ msg[0] }}
+                {{ msg[0] }}  -  <small>{{ new Date(msg[1]).getHours().toString().padStart(2, "0") }}:{{ new Date(msg[1]).getMinutes() }}</small>
             </div>
             <input type="text" style="background-color: transparent;" v-model="msg" placeholder="msg"><br>
             <button @click="sendMsg(msg, this.currentChat)">send</button>
