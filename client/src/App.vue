@@ -136,15 +136,12 @@ export default {
             }
 
            
-           
             //check if users is already in db
             if(this.users.some(e => e.name == _user.name)){
                 this.view = "chat";
                 this.currentChat = _user;
                 return;
             }
-
-           
 
             this.users.push(_user);
             this.chats.push({name: _user.name, chat: []});
@@ -156,6 +153,20 @@ export default {
             this.view = "chat";
         });
 
+        socket.on("gotKey", (_user) => {
+            const localuser = this.users.filter(e => e.name == _user.name);
+            if(localuser.length > 0){
+                this.users.filter(e => e.name == _user.name)[0].key = _user.key;
+                localStorage.setItem("users", JSON.stringify(this.users));
+                localStorage.setItem(_user.name, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
+            } else {
+                this.users.push(_user);
+                this.chats.push({name: _user.name, chat: []});
+                localStorage.setItem("users", JSON.stringify(this.users));
+                localStorage.setItem(_user.name, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
+            }
+        })
+
         socket.on("getMsg", (msg) => {
             const _user = msg.from;
             const _msg = window.atob(this.privateKey.decrypt(JSON.parse(msg.msg), "RSA-OAEP"));
@@ -165,6 +176,8 @@ export default {
                 this.chats.filter(e => e.name == _user)[0].chat.push(_msg);
                 localStorage.setItem(_user, JSON.stringify(this.chats.filter(e => e.name == _user)[0].chat));
             } else {
+                socket.emit("getPublicKeyFromNewUser", (_user));
+
                 this.users.push({name: _user, key: null});
                 this.chats.push({name: _user, chat: [_msg]});
                 localStorage.setItem("users", JSON.stringify(this.users));
@@ -222,7 +235,6 @@ export default {
                 return chatMsgs;
             }
            else {
-            alert("newChat?");
             return [];
            }
         },

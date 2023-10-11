@@ -182,15 +182,26 @@ io.on('connection', (socket)=> {
         await tokenCollection.deleteOne({ "_id": name});
     })
 
-    socket.on("getUser", (_username) => {
-        //search db not users!!!!
-        const _user = Users.filter(e => e.name == _username);
-        if(_user.length > 0){
-            const returnUser = {name: _user[0].name, key: _user[0].key};
-            console.log(returnUser);
+    socket.on("getUser", async (_username) => {
+        let keyResult = await keyCollection.findOne({ "_id": _username });
+        
+        if (keyResult){
+            const returnUser = {name: _username, key: keyResult.key};
             socket.emit("Userfound", (returnUser));
         } else {
             socket.emit("Userfound", (null));
+        }
+    });
+
+    socket.on("getPublicKeyFromNewUser", async (_username) => {
+        console.log(_username);
+        let keyResult = await keyCollection.findOne({ "_id": _username });
+        
+        if (keyResult){
+            const returnVal = {name: _username, key: keyResult.key};
+            socket.emit("gotKey", (returnVal));
+        } else {
+            socket.emit("gotKey", (null));
         }
     });
 
