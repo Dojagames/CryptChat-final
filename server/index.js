@@ -63,7 +63,7 @@ io.on('connection', (socket)=> {
 
             let keyResult = await keyCollection.findOne({ "_id": user.user }); 
             if(!keyResult){
-                //err
+                throw new Error("no Key found");
             }
             Users.push({name: user.user, id: socket.id, key: keyResult.key});
             
@@ -95,7 +95,7 @@ io.on('connection', (socket)=> {
             
             let keyResult = await keyCollection.findOne({ "_id": user.user }); 
             if(!keyResult){
-                //err
+                throw new Error("no Key found");
             }
             Users.push({name: user.user, id: socket.id, key: keyResult.key});
             socket.emit("loggedIn", (_token));
@@ -125,18 +125,18 @@ io.on('connection', (socket)=> {
                 }
 
                 const jwtRefreshToken = jwt.sign({user: _data.username}, process.env.REFRESH_TOKEN_SECRET);
-                const jwtTempToken = jwt.sign({user: _data.username}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "30m"}); 
+                const jwtTempToken = jwt.sign({user: _data.username}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "30m"});
                 
-                let keyResult = await keyCollection.findOne({ "_id": _data.username }); 
+                let keyResult = await keyCollection.findOne({ "_id": _data.username });
                 if(!keyResult){
-                    //err
+                    throw new Error("no Key found");
                 }
                 Users.push({name: _data.username, id: socket.id, key: keyResult.key});
 
-                socket.emit("getRefreshToken", (jwtRefreshToken));
+                socket.emit("getRefreshToken", (jwtRefreshToken)); //encrypt with public key
                 socket.emit("loggedIn", (jwtTempToken));
             } else {
-                socket.emit("cantLogin"); 
+                socket.emit("cantLogin");
             }
         }catch{
             console.log("errorCom")
@@ -177,7 +177,6 @@ io.on('connection', (socket)=> {
     });
 
     socket.on("logout", async () => {
-        // console.log(Users.filter(e => e.id == socket.id)[0].name);
         const name = Users.filter(e => e.id == socket.id)[0].name;
         await tokenCollection.deleteOne({ "_id": name});
     })

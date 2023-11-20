@@ -81,6 +81,8 @@ export default {
             var _sendMsg = JSON.stringify(encrypted);
   
             socket.emit("sendMsg", ({to: _user.name, msg: _sendMsg, time: Date.now()}));
+            this.chats.filter(e => e.name == _user.name)[0].chat.push([_msg, Date.now().toString(), "o"]);
+            localStorage.setItem(_from, JSON.stringify(this.chats.filter(e => e.name == _user.name)[0].chat));
         },
 
         handleIncommingMsg(_msg, _from, _time){
@@ -99,12 +101,12 @@ export default {
             }
 
             if(chatUser.length > 0 ){
-                this.chats.filter(e => e.name == _from)[0].chat.push([_msg, _time]);
+                this.chats.filter(e => e.name == _from)[0].chat.push([_msg, _time, "p"]);
                 localStorage.setItem(_from, JSON.stringify(this.chats.filter(e => e.name == _from)[0].chat));
                 
             } else {
                 socket.emit("getPublicKeyFromNewUser", (_from));
-                this.chats.push({name: _from, chat: [[_msg, _time]]});
+                this.chats.push({name: _from, chat: [[_msg, _time, "p"]]});
                 localStorage.setItem(_from, JSON.stringify(this.chats.filter(e => e.name == _from)[0].chat));
             }
 
@@ -264,7 +266,7 @@ export default {
                 return chatMsgs;
             }
            else {
-            return [];
+                return [];
            }
         },
     }
