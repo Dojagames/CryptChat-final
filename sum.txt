@@ -58,3 +58,32 @@ features:
         restore account -> swap device, create backup for keys etc
         migrate from other device
         delete account
+
+
+
+
+
+
+
+
+
+
+Next Steps to Continue Working on Privacy-First Chat Application:
+
+    Finalize Architecture and Design Decisions:
+        Refine the overall architecture, ensuring that every component adheres to the privacy-first approach.
+        Clearly define the concrete plans for the project goals to make sure each feature aligns with the vision.
+
+    UI Development:
+        Start implementing the user interface, focusing on privacy and usability.
+        Work on features like theme customization and simple, intuitive navigation to keep the UI user-friendly.
+
+    Set Up with Capacitor:
+        Integrate Capacitor to achieve cross-platform compatibility for iOS and Android.
+        Prepare for mobile testing to ensure the app performs smoothly across devices.
+
+    Development Environment Setup:
+        Build a robust development environment for easy testing, including configuration for testing on real devices.
+
+    Feature Planning:
+        Outline which features will be developed in each phase, starting with core chat features before moving on to advanced customizations.

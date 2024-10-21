@@ -36,7 +36,7 @@ At the end of each session, I will ask you to **update this summary** to ensure 
   - **Push Notifications**: Includes **customizable notifications**, with options to mute chats or disable message previews for privacy.
 - **User Profiles**: Basic profile features like **profile pictures**, **display names**, and **status messages**.
 - **Customization**: **Theme options** (light/dark modes), customizable **chat background**, and **accent colors**.
-- **Backup and Restore**: Options for encrypted backups, including **manual vs. regular schedules**, and the ability to **restore keys** during device migration.
+- **Backup and Restore**: Options for encrypted backups, including **manual vs. regular schedules**, and the ability to **restore keys** during device migration. Feature to migrate from backup
 
 ### **Key Decisions and Reasons**
 
