@@ -1,0 +1,60 @@
+Decisions:
+    frontend:
+        pinia
+        vue router
+
+    backend:
+        node.js
+        mongoDB
+        socket.io
+
+
+features:
+    guestmode: get a name an have a one time instance
+    Password-Encrypted Backups
+    User-Selected Backup Location (Google Drive/iCloud)
+    Backup Options (Regular vs. Manual, Text Only vs. Files)
+    Single Device Policy
+    compressing files on the client (file size limit)
+    generate key pair on client
+    no last online feature
+    privacy features are all enabled by default
+
+    chat features:
+        Delivery Status indicators (send, delivered, read)
+        real time messages
+        typing indicator
+        end to end by default
+        message reactions
+        voice messages
+        images, videos, files
+        link previews
+        basic media viewing
+        reply function
+        push notifications
+        smart notifications (mute chats, archive?)
+        online indicator
+        block users
+        one time messages
+
+    user settings:
+        profile picture, status text
+        display name
+        see online status, typing, read etc
+
+    setting:
+        notification settings ->
+            sounds
+            vibrations
+            mute
+            show content or not (only name, or nothing)
+            dnd mode
+        MFA
+        biometric lock
+        show encryption status
+        backup options -> how often, which data, where to save
+        data management -> see how much space each chat takes up, (options for autodelete msg after a specific time)
+        theme (light, dark); custom accent color(s), custom font, chat background
+        restore account -> swap device, create backup for keys etc
+        migrate from other device
+        delete account

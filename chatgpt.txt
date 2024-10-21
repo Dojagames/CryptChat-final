@@ -1,0 +1,83 @@
+**Privacy-First Chat Application Summary**
+
+Hello! I am currently working on a chat application with **privacy as the main aspect**, and I would like your help with different features, decisions, and technical challenges related to this project. Below is a detailed summary containing everything you need to know about the project, including goals, infrastructure choices, and previous iterations. This summary is intended to help continue from where we last left off without needing to explain everything from scratch.
+
+At the end of each session, I will ask you to **update this summary** to ensure it includes the most recent changes, progress made, and any decisions made during our discussion. This will serve as an ongoing record, making future sessions seamless and easy to pick up.
+
+### **Project Goals**
+
+1. **Privacy-First Approach**: Develop a chat application that prioritizes **user privacy** and **data security**. The main focus is to ensure **minimal data storage**, **end-to-end encryption (E2EE)**, and full user control over their data.
+2. **Simplified User Experience**: Create a **lean but fully functional chat app** that offers the core features users expect, while keeping the design and interactions simple, intuitive, and secure.
+3. **Ownership and Control**: Allow users to have **full ownership** over their data, including options for **self-hosting** the backend server and storing **encrypted backups** locally or in cloud services of their choice.
+4. **Fully Featured and Secure Communication**: Provide features that enhance **communication**, such as voice messages, file sharing, and one-time messages, without sacrificing user privacy or adding unnecessary complexity.
+5. **Multi-Device Management**: Implement a **single-device policy** for increased security, while enabling straightforward device migration, encrypted backups, and secure recovery.
+
+### **Plan and Infrastructure Decisions**
+
+- **Frontend**: Use **Vue.js** for the frontend, focusing on **modularity** and a user-friendly interface. This ensures quick development while allowing rich customization options like **dark/light themes**, **accent colors**, and **background customization**.
+
+- **Backend**: Use **Node.js** and **Socket.IO** for real-time messaging. The backend will be **modular** to allow easy switching between centralized hosting and self-hosting options. **MongoDB** will serve as the database for managing user metadata and optionally for message backups.
+
+- **Self-Hosting Option**: Provide users with a **Docker-based backend** that can be self-hosted, giving them full ownership of their server. The default configuration will point to a centralized server that users can switch from if they prefer more control.
+
+- **Single-Device Policy**: Restrict each account to one device at a time, reinforcing security by maintaining private keys on the device only. Device migration is possible through encrypted backups and QR-code-based key sharing.
+
+- **Data Ownership**: Users have complete control over their data, with **password-encrypted backups** that can be saved to **local storage**, **Google Drive**, or **iCloud**. Users decide on **backup frequency** and what gets backed up (text only vs. files).
+
+- **End-to-End Encryption (E2EE)**: Keys are **generated client-side** and the private key never leaves the device. This ensures that all messages and files are **securely encrypted** and no decryption capability exists on the server.
+
+### **Core Features Overview**
+
+- **Guest Mode**: Users can join as a guest with a one-time username, allowing for temporary chat sessions without needing to create an account.
+- **Messaging**:
+  - **Core Features**: Real-time messaging, **delivery status indicators** (sent, delivered, read), **typing indicators**, and **one-time messages**.
+  - **Multimedia**: Support for **voice messages**, **file sharing**, and **link previews**.
+  - **Privacy Options**: Users can block contacts, disable read receipts, and selectively show/hide profile information.
+  - **Push Notifications**: Includes **customizable notifications**, with options to mute chats or disable message previews for privacy.
+- **User Profiles**: Basic profile features like **profile pictures**, **display names**, and **status messages**.
+- **Customization**: **Theme options** (light/dark modes), customizable **chat background**, and **accent colors**.
+- **Backup and Restore**: Options for encrypted backups, including **manual vs. regular schedules**, and the ability to **restore keys** during device migration.
+
+### **Key Decisions and Reasons**
+
+- **Self-Hosting with Docker**: Providing a Docker image ensures users can **self-host** easily without complex setup. Docker Compose scripts help users start up with one command, giving them a choice to store data locally or use a public server for simplicity.
+- **No Central Message Storage**: Messages are stored **locally on devices**, and no persistent storage on the server is used for the messages themselves to maximize privacy. This decision enhances user privacy but simplifies the implementation by excluding **editing or deleting messages** after they’re sent.
+- **No Last Online or Online Status**: By default, users are **not visible online**. This is to prevent tracking and increase privacy. Users can choose to enable this feature if they want it, but the default will be set to privacy-first.
+- **Skip Editing/Deleting Messages**: Due to the added complexity of synchronizing edited or deleted messages in an E2EE environment, these features have been excluded. Instead, a **one-time message feature** has been added to allow users to share ephemeral content without persistence.
+- **One-Time Messages**: Introduced as a privacy-focused feature, allowing users to send messages that **self-destruct** after being read or after a short period. This helps reduce the risk of unintended long-term data exposure.
+
+### **Progress Tracking and Iterations**
+
+- **Initial Implementation**: Created the basic structure with **Vue.js** for the frontend and **Node.js** for backend communication with **Socket.IO**. Guest mode and basic profile features implemented.
+- **Version 1.1**: Added support for **Docker-based self-hosting** for the backend, allowing users to easily spin up a backend server with **persistent storage** options.
+- **Version 1.2**: Removed **editing/deleting messages** due to complexity concerns and added the **one-time message feature** instead. Adjusted **notification settings** to allow disabling message previews on lock screens.
+- Version 1.3: **Finalized backup features** by adding user options for **backup frequency**, **content selection** (e.g., text only vs. files), **backup location** (Google Drive, iCloud, local storage), and enforcing **password protection** for backups.
+- **Version 1.4**: Added a **backup recovery feature** allowing users to recover their account if they forget their backup password. Options include **recovery questions**, **recovery keys**, or a secure reset method to maintain data integrity.
+
+
+
+#### **Short-Term Goals (Finalizing Architecture and Design Decisions)**
+
+1. finalize Arcitecuture and design decisions
+2. redefine concrete plans for goals
+
+
+
+#### **Mid-Term Goals (Building UI and Setting Up Development Environment)**
+
+1. **UI Development**: Start building the **user interface** with a focus on privacy and usability, ensuring features like **theme customization** and **simple navigation** are included.
+2. **Set Up with Capacitor**: Integrate **Capacitor** for cross-platform compatibility to support iOS and Android applications.
+3. **Development Environment**: Set up a robust **development environment**, including local testing with real devices, for efficient testing of the app.
+4. **Feature Planning**: Further plan which features will be implemented in each phase, prioritizing core chat functionalities before expanding to advanced customization features.
+
+#### **Long-Term Goals**
+
+1. **Temporary Multi-Device Access (WhatsApp Web-Like Feature)**: Explore the implementation of a temporary, **web-based instance** that allows users to access their chats on another device for a limited period. This will adhere strictly to the single-device policy by requiring active authorization from the primary device and will automatically disconnect after a set period.
+2. **Backup Recovery Option**: Develop a **backup recovery feature** that allows users to recover their account in case they forget their backup password. This could include options like **recovery questions**, **recovery keys**, or providing a secure way to reset the backup password while maintaining data integrity.
+
+
+
+### Version Update Request
+
+At the end of each session, I will ask you to update this summary to ensure it includes the most recent changes, progress made, and any decisions made during our discussion. Additionally, every change will be automatically reflected in the Progress Tracking and Iterations section, ensuring consistent documentation of the project history. This will serve as an ongoing record, making future sessions seamless and easy to pick up.
+
