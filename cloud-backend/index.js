@@ -6,6 +6,12 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 const PORT = 3000;
 
+// Set this to true if running in production with a domain
+const production = false; // Change to true for production mode
+
+// Define the domain URL for production mode
+const domain = 'https://tempcloud.jonx.dev'; // Replace with your actual domain
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 
@@ -65,7 +71,9 @@ app.post('/upload', (req, res) => {
         saveFilesMapToDisk();
 
         // Create a unique link for accessing the file
-        const link = `http://localhost:${PORT}/download/${uniqueId}`;
+        const link = production
+            ? `${domain}/download/${uniqueId}`
+            : `http://localhost:${PORT}/download/${uniqueId}`;
 
         // Respond with the link
         res.json({ link });
@@ -117,7 +125,11 @@ app.get('/download/:id', (req, res) => {
 // Start the server and handle startup errors
 try {
     app.listen(PORT, () => {
-        console.log(`Server is running on http://localhost:${PORT}`);
+        if (production) {
+            console.log(`Server is running in production mode on ${domain}`);
+        } else {
+            console.log(`Server is running on http://localhost:${PORT}`);
+        }
     });
 } catch (err) {
     console.error('Error starting server:', err);
