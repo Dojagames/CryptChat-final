@@ -1,0 +1,87 @@
+frontend:
+
+    globally stored array of objects(users)
+        these objects contain the name, the last message, the date and time of the last message, the unread count, notification settings and an id
+
+    each chat has a locally saved array of messages those are sorted by having the corresponding id and a date
+    when opening the chat, the messages get loaded from the storage and if the user scrolls up new messages lazy load
+
+    msg object: {
+        chatId: "username",
+        text: "test",
+        date: "23.02.2023",
+        time: unix timestamp,
+        send: boolean,
+    }
+
+    msg chunk object: {
+        chunkId: "username-23.02.2023"
+        messages: [
+            {msg}, {msg}...
+        ]
+    }
+
+    chats array: [
+        chat object: {
+            participants: [you, username]
+            chatID: ""
+
+            friendStatus: blocked, active, request,
+            online: bool,
+            typing: bool,
+
+            notificationSetting: {
+                muted: bool,
+                muteUntil: unixTimestamp,
+                archived: bool
+            },
+            lastMessage: {msgObject},
+            unreadCount: number of unopened messages
+        }
+    ]
+
+
+
+
+
+
+when a msg is send:
+
+sender:
+sends msg object to server with (msg, chat/username, unique id)
+
+server: checks if user exists in db, (if not return user doesn't exist);
+check if user is online, if the user is online send the message, if not store in db
+when message is delivered, notify the sender that the message is delivered
+
+recipient:
+decrypt msg
+checks if user is already in user list, if not create user obj and push to users list
+try to load current chunk, if chunk doesn't exist create one
+update the user obj (increment unread messages, update last message);
+save the chunk to local storage
+
+
+when sending documents -> always send files to cloud and send the recipient the link (user can decide when and if they want to download images)
+
+
+user and key generation, auth flow, sessions:
+
+if a new user is created, the client generates a key pair and send the public key to the server but stores the public key if the server need to request it again
+biometric lock
+
+combined method for storing key save (biometric and other factors)
+
+
+
+
+create own cloud storage for undelivered documents like videos and images (encrypted)
+
+
+
+
+
+
+
+Settings:
+auto-download with wifi / always / never
