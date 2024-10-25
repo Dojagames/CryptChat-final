@@ -30,6 +30,8 @@ frontend:
             online: bool,
             typing: bool,
 
+            firstMessage: date,
+
             notificationSetting: {
                 muted: bool,
                 muteUntil: unixTimestamp,
@@ -39,6 +41,20 @@ frontend:
             unreadCount: number of unopened messages
         }
     ]
+
+
+
+
+
+
+
+
+
+localStorageSetup:
+chats with dates and names in chunks
+settings
+id / session details?
+list of contacts (to load chats)  | this has to include the date of the first message to only look to this date
 
 
 
@@ -85,3 +101,15 @@ create own cloud storage for undelivered documents like videos and images (encry
 
 Settings:
 auto-download with wifi / always / never
+
+
+
+
+
+
+
+
+
+
+
+//app workflow

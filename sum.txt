@@ -87,3 +87,15 @@ Next Steps to Continue Working on Privacy-First Chat Application:
 
     Feature Planning:
         Outline which features will be developed in each phase, starting with core chat features before moving on to advanced customizations.
+
+
+
+
+
+
+
+
+App workflow:
+opens
+loads stores from localstorage (main.js)
+check if logged in
