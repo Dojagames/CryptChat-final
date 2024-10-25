@@ -22,7 +22,7 @@
 
 <template>
   <Background/>
-  <!--<RouterView /> -->
+  <RouterView />
 </template>
 
 <style scoped>

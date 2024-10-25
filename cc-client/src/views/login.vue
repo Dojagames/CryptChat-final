@@ -10,7 +10,7 @@
 
 <style scoped>
   .login-container {
-    width: 24%;
+    width: clamp(16%, 460px, 95%);
     height: 90%;
 
     position: absolute;

@@ -2,16 +2,19 @@
 export default {
   data() {
     return {
-      numSpheres: 5, // Default number of spheres
-      numLightSpots: 6, // Default number of light spots
-      baseSphereSize: 13, // Base size for spheres
-      sphereSizeVariation: 10, // Size variation for spheres
-      baseLightSpotSize: 15, // Base size for light spots
-      lightSpotSizeVariation: 20, // Size variation for light spots
-      lightSpotLuminanceVariation: 0.2, //variation
+      numSpheres: 3, // Default number of spheres
+      numLightSpots: 3, // Default number of lightspots
+      baseSphereSize: 20, // Base size for spheres in px * 10
+      sphereSizeVariation: 5, // Size variation for spheres in px * 10
+      baseLightSpotSize: 15, // Base size for light spots in px *10
+      lightSpotSizeVariation: 20, // Size variation for light spots in px
+      lightSpotLuminanceVariation: 0.2, //variation of luminance (if the value is 0.2 the luminance is between 1 and .8)
 
       baseColor: { r: 230, g: 30, b: 210 }, // Base RGB color
-      backgroundColor: '#2a004d', // Background color
+      backgroundColor: {r: 42,g: 0,b: 77}, // Background color
+      backgroundGradientAngle: 135,
+      backgroundGradientOpacityStart: 1,
+      backgroundGradientOpacityEnd: 0.5,
       sphereBlurAmount: 4, // Blur amount for spheres
 
       spheres: [],
@@ -22,9 +25,27 @@ export default {
     this.generateLightSpots();
     this.generateSpheres();
     const root = document.documentElement;
+
     root.style.setProperty('--background-base-r', this.baseColor.r);
     root.style.setProperty('--background-base-g', this.baseColor.g);
     root.style.setProperty('--background-base-b', this.baseColor.b);
+
+    root.style.setProperty('--background-color',
+      `rgb(
+        r: ${this.backgroundColor.r},
+        g: ${this.backgroundColor.g},
+        b: ${this.backgroundColor.b}
+      )`
+    );
+    root.style.setProperty('--background-gradient-angle', this.backgroundGradientAngle + "deg",);
+    root.style.setProperty('--background-color-rgb', `
+      ${this.backgroundColor.r},
+      ${this.backgroundColor.g},
+      ${this.backgroundColor.b}
+    `);
+    root.style.setProperty('--background-opacity-1', this.backgroundGradientOpacityStart);
+    root.style.setProperty('--background-opacity-2', this.backgroundGradientOpacityEnd);
+
   },
   methods: {
     generateSpheres() {
@@ -122,7 +143,7 @@ export default {
 
   /* Light spot color using base RGB values */
   --light-spot-color: rgba(var(--background-base-r), var(--background-base-g), var(--background-base-b), 0.5);
-  --background-color: #2a004d;
+
 }
 
 .background-wrapper {
@@ -131,7 +152,8 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1; /* Ensure background stays behind all other elements */
+  z-index: -100; /* Ensure background stays behind all other elements */
+  background-color: black;
   overflow: hidden;
 }
 
@@ -141,7 +163,11 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--background-color); /* Dark purple background */
+  background: linear-gradient(
+    var(--background-gradient-angle),
+    rgba(var(--background-color-rgb), var(--background-opacity-1)),
+    rgba(var(--background-color-rgb), var(--background-opacity-2))
+  );
   overflow: hidden;
 }
 

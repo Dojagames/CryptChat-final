@@ -2,7 +2,6 @@
 :root {
     --default-text-color: #eaeaea;
     --secondary-text-color: #6a3996;
-    --background-color: #232323;
     --secondary-background-color: #2e2e34;
     --primary-color: #007bff;
     --secondary-color: #0056b3;
@@ -13,7 +12,15 @@
 
     --background-base-r: 230;
     --background-base-g: 30;
-    --background-base-b: 210;}
+    --background-base-b: 210;
+
+    --background-color: #2a004d;
+    --background-gradient-angle: 45deg;
+    --background-color-rgb: 42, 0, 77;
+    --background-opacity-1: 1;
+    --background-opacity-2: 0.75;
+
+}
 
 body, html {
     height: 100vh;
