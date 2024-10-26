@@ -14,7 +14,7 @@ export default {
       lightSpotLuminanceVariation: 0.2, //variation of luminance (if the value is 0.2 the luminance is between 1 and .8)
 
       baseColor: { r: 230, g: 30, b: 210 }, // Base RGB color
-      backgroundColor: {r: 42,g: 0,b: 77}, // Background color
+      backgroundColor: { r: 42, g: 0, b: 77 }, // Background color
 
       backgroundGradientAngle: 135,
       backgroundGradientOpacityStart: 1,
