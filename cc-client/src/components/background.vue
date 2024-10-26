@@ -3,19 +3,22 @@ export default {
   data() {
     return {
       numSpheres: 3, // Default number of spheres
-      numLightSpots: 3, // Default number of lightspots
-      baseSphereSize: 20, // Base size for spheres in px * 10
-      sphereSizeVariation: 5, // Size variation for spheres in px * 10
-      baseLightSpotSize: 15, // Base size for light spots in px *10
-      lightSpotSizeVariation: 20, // Size variation for light spots in px
+      baseSphereSize: 25, // Base size for spheres in px * 10
+      sphereSizeVariation: 15, // Size variation for spheres in px * 10
+      sphereBlurAmount: 1, // Blur amount for spheres
+      minDistanceBetweenSpheres: 5, //in px * 10
+
+      numLightSpots: 7, // Default number of lightspots
+      baseLightSpotSize: 20, // Base size for lightspots in px *10
+      lightSpotSizeVariation: 10, // Size variation for light spots in px
       lightSpotLuminanceVariation: 0.2, //variation of luminance (if the value is 0.2 the luminance is between 1 and .8)
 
       baseColor: { r: 230, g: 30, b: 210 }, // Base RGB color
       backgroundColor: {r: 42,g: 0,b: 77}, // Background color
+
       backgroundGradientAngle: 135,
       backgroundGradientOpacityStart: 1,
       backgroundGradientOpacityEnd: 0.5,
-      sphereBlurAmount: 4, // Blur amount for spheres
 
       spheres: [],
       lightSpots: []
@@ -51,7 +54,7 @@ export default {
     generateSpheres() {
       const generatedSpheres = [];
       let attempts = 0;
-      const maxAttempts = 1000; // Maximum number of attempts to place spheres
+      const maxAttempts = 2000; // Maximum number of attempts to place spheres
       for (let i = 0; i < this.numSpheres; i++) {
         let position;
         let overlaps;
@@ -66,11 +69,27 @@ export default {
             left: Math.random() * 80 + 10, // Random percentage between 10% and 90%
             size: Math.random() * this.sphereSizeVariation + this.baseSphereSize // Random size with base size and variation
           };
-          overlaps = generatedSpheres.some(
-            (sphere) =>
-              Math.abs(sphere.top - position.top) < position.size + sphere.size &&
-              Math.abs(sphere.left - position.left) < position.size + sphere.size
-          );
+
+          const newSphereRadius = (position.size / 2);
+
+          overlaps = generatedSpheres.some((sphere) => {
+            // Calculate the radius of the existing sphere
+            const existingSphereRadius = sphere.size / 2;
+
+            // Calculate the center positions of both spheres
+            const center1X = position.left + newSphereRadius;
+            const center1Y = position.top + newSphereRadius;
+            const center2X = sphere.left + existingSphereRadius;
+            const center2Y = sphere.top + existingSphereRadius;
+
+            // Calculate the distance between the centers of the two spheres
+            const distance = Math.sqrt(
+              (center1X - center2X) ** 2 + (center1Y - center2Y) ** 2
+            );
+
+            // Check if the distance is less than the sum of the radii (indicating overlap)
+            return distance < newSphereRadius + existingSphereRadius + this.minDistanceBetweenSpheres;
+          });
           attempts++;
         } while (overlaps);
         generatedSpheres.push(position);

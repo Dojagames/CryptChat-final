@@ -1,0 +1,5 @@
+Remove tilt shift effect and save it as standalone and put on template folder
+optimize wallpaper engine for mobile
+optimize design for mobile
+get started with capacitor
+start eight with design of chat or logic for account and login system
