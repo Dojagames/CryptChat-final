@@ -4,8 +4,8 @@ export default {
     return {
       numSpheres: 3, // Default number of spheres
       baseSphereSize: 25, // Base size for spheres in px * 10
-      sphereSizeVariation: 15, // Size variation for spheres in px * 10
-      sphereBlurAmount: 1, // Blur amount for spheres
+      sphereSizeVariation: 25, // Size variation for spheres in px * 10
+      sphereBlurAmount: 4, // Blur amount for spheres
       minDistanceBetweenSpheres: 5, //in px * 10
 
       numLightSpots: 7, // Default number of lightspots
@@ -49,6 +49,9 @@ export default {
     root.style.setProperty('--background-opacity-1', this.backgroundGradientOpacityStart);
     root.style.setProperty('--background-opacity-2', this.backgroundGradientOpacityEnd);
 
+    const background = document.getElementById("backgroundCanvas");
+    background.style.width = window.innerWidth + "px";
+    background.style.height = window.innerHeight + "px";
   },
   methods: {
     generateSpheres() {
@@ -137,7 +140,7 @@ export default {
 <template>
   <div class="background-wrapper">
     <div class="background-container">
-      <div class="background">
+      <div class="background" id="backgroundCanvas">
         <div v-for="(sphere, index) in spheres" :key="`sphere-${index}`" :class="['sphere', `sphere-${index}`]" :style="getSphereStyle(sphere)"></div>
         <div v-for="(lightSpot, index) in lightSpots" :key="`light-spot-${index}`" :class="['light-spot', `light-spot-${index}`]" :style="getLightSpotStyle(lightSpot)"></div>
       </div>
@@ -194,8 +197,8 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 177.78vh; /* 16:9 aspect ratio based on height */
-  height: 100vh;
+  /*width: 2560px; /* 16:9 aspect ratio based on height || maybe change to 1 to 1 ratio || 177.78vw
+  height: 1080px; */
   min-width: 100%;
   min-height: 100%;
   transform: translate(-50%, -50%);
