@@ -1,4 +1,4 @@
-
+@import './font.css';
 :root {
     --default-text-color: #eaeaea;
     --secondary-text-color: #6a3996;
@@ -30,7 +30,11 @@ body, html {
     overflow: hidden;
 }
 
-
+*{
+    color: var(--default-text-color);
+    font-family: 'Noto Sans', sans-serif;
+    letter-spacing: .05rem;
+}
 
 /* Container for the entire chat app */
 .chat-container {

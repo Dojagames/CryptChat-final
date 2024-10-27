@@ -1,9 +1,13 @@
 <script setup>
+import HomeHeader from "@/components/home-header.vue";
+import HomeChat from "@/components/home-chat-list.vue";
+
 
 </script>
 
 <template>
-home
+  <HomeHeader/>
+  <HomeChat/>
 </template>
 
 <style scoped>

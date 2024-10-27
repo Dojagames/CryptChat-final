@@ -13,7 +13,7 @@
   const router = useRouter();
 
   if(!loggedIn){
-    router.push('/login');
+    //router.push('/login');
   }
 
 
