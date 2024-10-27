@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 export const useUsersStore = defineStore('users', () => {
   const users = ref([]);
-
+  users.value = ["John", "Doe", "Alice"];
   function addUser(user) {
     users.value.push(user);
   }
@@ -21,4 +21,6 @@ export const useUsersStore = defineStore('users', () => {
       callback("user not found");
     }
   }
+
+  return {users, addUser, updateUser};
 })

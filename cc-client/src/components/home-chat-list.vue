@@ -1,12 +1,12 @@
 <script setup>
 import ChatPreview from "@/components/chat-preview.vue";
+import {useSession} from '@/stores/sessionStore.js';
+import {useUsersStore} from "@/stores/usersStore.js";
 
-const chats = [
-  "John",
-  "Marc",
-  "Bob",
-  "Alice"
-]
+const userStore = useUsersStore();
+
+
+const chats = userStore.users
 
 </script>
 
