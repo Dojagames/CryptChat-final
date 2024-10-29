@@ -22,9 +22,27 @@
 
 <template>
   <Background/>
-  <RouterView />
+  <transition name="slide" appear mode="out-in">
+    <RouterView />
+  </transition>
 </template>
 
 <style scoped>
+/* Entering Animation */
+.slide-enter-active {
+  transition: transform 0.5s ease;
+}
 
+.slide-enter {
+  transform: translateX(100%); /* Start the new page from the right side */
+}
+
+/* Leaving Animation */
+.slide-leave-active {
+  transition: transform 0.5s ease;
+}
+
+.slide-leave-to {
+  transform: translateX(-100%); /* Move the page out to the left side */
+}
 </style>

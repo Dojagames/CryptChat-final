@@ -3,10 +3,10 @@ export default {
   data() {
     return {
       numSpheres: 3, // Default number of spheres
-      baseSphereSize: 25, // Base size for spheres in px * 10
-      sphereSizeVariation: 25, // Size variation for spheres in px * 10
+      baseSphereSize: 15, // Base size for spheres in px * 10
+      sphereSizeVariation: 10, // Size variation for spheres in px * 10
       sphereBlurAmount: 4, // Blur amount for spheres
-      minDistanceBetweenSpheres: 5, //in px * 10
+      minDistanceBetweenSpheres: 30, //in px * 10
 
       numLightSpots: 7, // Default number of lightspots
       baseLightSpotSize: 20, // Base size for lightspots in px *10

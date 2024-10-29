@@ -6,10 +6,16 @@ import HomeChat from "@/components/home-chat-list.vue";
 </script>
 
 <template>
-  <HomeHeader/>
-  <HomeChat/>
+    <div class="home">
+      <HomeHeader/>
+      <HomeChat/>
+    </div>
 </template>
 
 <style scoped>
+.home {
+  position: relative;
+}
+
 
 </style>

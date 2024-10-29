@@ -3,7 +3,11 @@ import { defineStore } from 'pinia'
 
 export const useUsersStore = defineStore('users', () => {
   const users = ref([]);
-  users.value = ["John", "Doe", "Alice"];
+  users.value = [
+    {name: "John", lastMsg: "hallo du bastard"},
+    {name: "Doe", lastMsg: "testtesttest"},
+    {name: "Alice", lastMsg: "124"}
+  ];
   function addUser(user) {
     users.value.push(user);
   }

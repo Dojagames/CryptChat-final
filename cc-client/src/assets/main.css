@@ -2,12 +2,14 @@
 :root {
     --default-text-color: #eaeaea;
     --secondary-text-color: #6a3996;
+    --primary-background-color: #444444;
     --secondary-background-color: #2e2e34;
     --primary-color: #007bff;
     --secondary-color: #0056b3;
     --border-color: #ccc;
     --accent-color: #c75f5f;
-
+    --date-text-color: #ff8513;
+    --transparent-background: #FFFFFF15;
 
 
     --background-base-r: 230;
@@ -23,10 +25,16 @@
 }
 
 body, html {
-    height: 100vh;
+    height: 100%;
     width: 100vw;
     margin: 0;
     padding: 0;
+    overflow: hidden;
+}
+
+#app{
+    height: 100%;
+    width: 100%;
     overflow: hidden;
 }
 
@@ -115,4 +123,18 @@ body, html {
 
 .chat-input button:hover {
     background-color: var(--secondary-color);
+}
+
+
+
+.slide-enter-active, .slide-leave-active {
+    transition: transform 0.5s ease;
+}
+
+.slide-enter {
+    transform: translateX(100%); /* Start from the right */
+}
+
+.slide-leave-to {
+    transform: translateX(-100%); /* Slide out to the left */
 }
