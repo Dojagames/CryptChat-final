@@ -5,11 +5,11 @@ import { RouterLink, RouterView, useRouter } from 'vue-router';
 const props = defineProps({
   chat: Object,
 })
-
+console.log(props.chat);
 const router = useRouter();
 
 function goToChat(){
-  router.push({ name: 'chat', params: { user: props.chat.name } });
+  router.push({ name: 'chat', params: { user: props.chat.displayName } });
 }
 
 </script>
@@ -19,7 +19,7 @@ function goToChat(){
     <img class="preview-img" src="https://cdn.britannica.com/98/214598-050-9879F2FA/giant-sequoia-tree-Sequoia-National-Park-California.jpg" alt="pb">
     <div class="preview-text-wrapper">
       <div class="preview-name">
-        <p class="preview-secondElement">{{props.chat.name}}</p>
+        <p class="preview-secondElement">{{props.chat.username}}</p>
       </div>
       <div class="preview-lastMsg">
         <p class="preview-secondElement">{{props.chat.lastMsg}}</p>

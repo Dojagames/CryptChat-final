@@ -2,14 +2,12 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useUsersStore = defineStore('users', () => {
-  const users = ref([]);
-  users.value = [
-    {name: "John", lastMsg: "hallo du bastard"},
-    {name: "Doe", lastMsg: "testtesttest"},
-    {name: "Alice", lastMsg: "124"}
-  ];
+  const users = ref({});
+
+
+
   function addUser(user) {
-    users.value.push(user);
+    users.value[user.username] = user;
   }
 
   function updateUser(name, updatedUser, callback) {
