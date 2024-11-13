@@ -13,7 +13,7 @@
   const router = useRouter();
 
   if(!loggedIn){
-    //router.push('/login');
+    router.push('/login');
   }
 
 
@@ -22,9 +22,7 @@
 
 <template>
   <Background/>
-  <transition name="slide" appear mode="out-in">
-    <RouterView />
-  </transition>
+  <RouterView />
 </template>
 
 <style scoped>

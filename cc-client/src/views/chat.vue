@@ -5,10 +5,13 @@ import ChatFooter from "@/components/chat-footer.vue";
 
 import { useRoute } from 'vue-router';
 import { ref, onMounted, nextTick } from 'vue';
+import {useUsersStore} from "@/stores/usersStore.js";
 
 const route = useRoute();
-const chat = route.params.user; // use for header
+const userStore = useUsersStore();
+const users = userStore.users;
 
+const chat = users[route.params.user] || {username: "test"}; // use for header
 
 const chatContainer = ref(null);
 
@@ -143,20 +146,54 @@ onMounted(() => {
   });
 });
 
+function search(value) {
+  console.log(value);
+//handle search
+  if(value){
+    //search texts in chat ()
+  }
+}
+//emits from header
+function openProfile(){
+  //create modal with profilepicture and username from chat.username and chat.displayName
+  //modal should be closed when clicking outside
 
+  console.log("open profile");
+}
 
+function call(){
+  console.log("call");
+}
+
+function openSettings(){
+  console.log("open settings");
+}
 </script>
 <!-- wrap in div with flex and  -->
 <template>
   <div id="chat-wrapper">
-    <ChatHeader :chat="chat"/>
+    <ChatHeader :chat="chat" @openProfile="openProfile" @search="search" @call="call" @openSettings="openSettings"/>
     <div ref="chatContainer" id="msgBox" @scroll="handleScroll">
       <Message  v-for="(msg, index) in messages"
                 :msg="msg"
                 :newDate="(index !== 0) ? (messages[index - 1].date !== messages[index].date) : true"
       />
     </div>
-    <ChatFooter/>
+    <ChatFooter @changedHeight="scrollToBottom"/>
+  </div>
+
+  <div id="profile-modal" v-if="showProfileModal">
+    <div id="profile-modal-content">
+      <img id="profile-modal-picture" src="https://cdn.britannica.com/98/214598-050-9879F2FA/giant-sequoia-tree-Sequoia-National-Park-California.jpg" alt="profile picture">
+      <p id="profile-modal-displayName">{{chat.displayName}}</p>
+    </div>
+    <div id="profile-modal-buttons">
+      <button id="profile-modal-button-close">Close</button>
+      <button id="profile-modal-button-edit">Edit</button>
+    </div>
+  </div>
+  <div id="profile-modal-buttons" v-if="showSearchModal">
+    <!--  -->
   </div>
 </template>
 

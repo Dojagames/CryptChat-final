@@ -40,7 +40,7 @@ function goToChat(){
     backdrop-filter: blur(4px);
     margin: 1vw;
 
-    border-radius: .5vw;
+    border-radius: 2vw;
 
     display: flex;
     flex-direction: row;

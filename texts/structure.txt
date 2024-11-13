@@ -1,3 +1,8 @@
+Start:
+load users object from db
+format: Users[user];
+
+
 frontend:
 
     globally stored array of objects(users)
@@ -42,7 +47,43 @@ frontend:
         }
     ]
 
+    user object: {
+        username: String,
+        first message: date,
+        privacySettings: {
+            lastOnline: bool,
+            typing: bool,
+            online: bool,
+            showPb: bool,
 
+        },
+        pb: (privacySettings.showPb) ? 'url', 'default, image',
+        lastMessage: String,
+        typing: bool (updates via socket.on),
+
+    }
+
+//open chat -> load chatmsgs
+start from current date (username + date)
+load them into chat[username]
+
+let date = new Date(Date.now);
+const endDate = Users[username].firstMessage
+while(chat[user].length < 150 && date < endDate){
+    const tempMsgs = loadFromDB('chats', username + "-" + getStringFromDate(date));
+    if(tempMsgs){
+       const msgList = JSON.parse(tempMsgs);
+       chat[user] = [...msgList].append([...chat[user]]);
+    }
+    date = date - 24h;
+}
+
+function getStringFromDate(date){
+    if(!date instanceof Date){
+        return "";
+    }
+    return date.getMonth() + '-' + date.getDate();
+}
 
 
 
