@@ -19,6 +19,7 @@ userStore.addUser({
   username: "John",
   displayName: "John",
   lastMsg: "test123",
+  //lastMsgTimeStamp: Date.now(),
 });
 
 userStore.addUser({

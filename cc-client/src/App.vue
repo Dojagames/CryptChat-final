@@ -1,8 +1,13 @@
 <script setup>
   import { RouterLink, RouterView, useRouter } from 'vue-router';
   import Background  from "@/components/background.vue";
-  import {onMounted} from "vue";
+  import {onMounted, provide} from "vue";
   import {useSession} from '@/stores/sessionStore.js';
+  import io from 'socket.io-client';
+
+  const socket = io('localhost:3000');
+  provide('socket', socket);
+
 
   const session = useSession();
   //startup logic goes here
@@ -13,7 +18,7 @@
   const router = useRouter();
 
   if(!loggedIn){
-    //router.push('/login');
+    router.push('/login');
   } else {
     //socket.emit('login');
   }

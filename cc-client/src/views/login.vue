@@ -1,87 +1,116 @@
 <script setup>
-import {ref} from "vue";
+import { ref, inject, onUnmounted } from "vue";
+import { useProfileStore } from "@/stores/profileStore.js";
+import { useSession } from '@/stores/sessionStore.js';
+import { useRouter } from 'vue-router';
 
-import socket from '../socket.js';
-
-import {useProfileStore} from "@/stores/profileStore.js";
-import {useSession} from '@/stores/sessionStore.js';
-
+const router = useRouter();
 
 const profileStore = useProfileStore();
 const session = useSession();
 
+// Inject socket (assuming it was provided by a parent component or globally)
+const socket = inject('socket');
 
 import EC from 'elliptic';
 const ec = new EC.ec('secp256k1'); // Use the secp256k1 elliptic curve
-let username = ref("");
-let displayName = ref("");
 
+// Reactive variables
+const username = ref("");
+const displayName = ref("");
+const registering = ref(true);
+const error = ref(null);
+
+// Non-reactive variables for the key pair
 let keyPair;
 let publicKey;
 
-let registering = ref(true);
+function register(name) {
+  if (!name) {
+    error.value = 'Username is required';
+    return;
+  }
 
+  console.log("registering with username:", name);
 
+  // Generate key pair
+  keyPair = ec.genKeyPair();
+  publicKey = keyPair.getPublic('hex');
 
-
-function register(name){
-    console.log(name);
-    keyPair = ec.genKeyPair();
-    publicKey = keyPair.getPublic('hex');
-
-    if (username) {
-      socket.emit('register', {
-        username: username,
-        publicKey: publicKey,
-      });
-    } else {
-      this.error = 'Username is required';
-    }
+  // Emit register event with the user data
+  const user = {
+    username: name,
+    publicKey: publicKey,
+  };
+  socket.emit('register', user); // No need to wrap `user` in parentheses
 }
 
-function setDisplayName(name){
-  socket.emit('setDisplayName', (name));
+function setDisplayName(name) {
+  if (!name) {
+    error.value = 'Display name is required';
+    return;
+  }
 
-  session.login();
+  socket.emit('setDisplayName', name);
 }
 
+// Socket event listeners
 socket.on('displayNameSet', (name) => {
   session.login();
   profileStore.setUsername(name);
+  router.push('/chat');
 });
 
-
 socket.on('registered', () => {
-  //save UserObj
   profileStore.setProfile({
-    username: username,
-    displayName: username,
+    username: username.value,
+    displayName: username.value,
     keyPair: keyPair,
     publicKey: publicKey,
   });
-  registering = false;
+  registering.value = false;
 });
 
 socket.on('register_failed', (reason) => {
-  if(reason === 'username_taken') {
-
+  if (reason === 'username_taken') {
+    error.value = 'Username is already taken';
   } else {
-
+    error.value = 'Registration failed';
   }
-  console.error('Failed to register', reason);
+  console.error('Failed to register:', reason);
 });
 
-
+// Cleanup socket listeners on component unmount
+onUnmounted(() => {
+  socket.off('displayNameSet');
+  socket.off('registered');
+  socket.off('register_failed');
+});
 </script>
 
 <template>
-  <div class="login-container" v-if="registering">
-    <input class="login-input-name" placeholder="Username" type="text" v-model="username">
-    <button class="login-button" @click="register(username)">Register</button>
+  <div v-if="registering" class="login-container">
+    <input
+      v-model="username"
+      type="text"
+      placeholder="Username"
+      class="login-input-name"
+      @keyup.enter="register(username)"
+    />
+    <button @click="register(username)" class="login-button">Register</button>
+    <p v-if="error" class="error-message">{{ error }}</p>
   </div>
-  <div class="login-container" v-else>
-    <input class="login-input-name" placeholder="Displayname" type="text" v-model="displayName">
-    <button class="login-button" @click="setDisplayName(displayName)">Register</button>/
+
+  <div v-else class="login-container">
+    <input
+      v-model="displayName"
+      type="text"
+      placeholder="Display name"
+      class="login-input-name"
+      @keyup.enter="setDisplayName(displayName)"
+    />
+    <button @click="setDisplayName(displayName)" class="login-button">Set Display Name</button>
+    <p v-if="error" class="error-message">{{ error }}</p>
   </div>
 </template>
 

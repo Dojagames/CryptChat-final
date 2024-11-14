@@ -1,13 +1,13 @@
 <script setup>
 import HomeHeader from "@/components/home-header.vue";
 import HomeChat from "@/components/home-chat-list.vue";
-import {ref} from "vue";
+import {ref, inject} from "vue";
 
 import {useUsersStore} from "@/stores/usersStore.js";
 
 const userStore = useUsersStore();
 
-import socket from '../socket.js';
+const socket = inject('socket');
 
 let addUserModal = ref(false);
 let usernameToAdd = ref("");

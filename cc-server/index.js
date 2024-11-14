@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
     // Handle user registration with public keys generated on the client side
     socket.on('register', async (data) => {
         const { username, publicKey } = data;
-
+        console.log(username + "tries to register");
 
         let user = await loadUser(username);
         if(user){
