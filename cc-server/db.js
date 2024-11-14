@@ -2,6 +2,7 @@ const mongoose = require('mongoose'); // Import mongoose for MongoDB
 
 const userSchema = new mongoose.Schema({
     username: { type: String, unique: true, required: true },
+    displayName: { type: String, required: true },
     uuid: { type: String, required: true },
     publicKey: { type: String, required: true },
 });
@@ -111,6 +112,7 @@ async function createUser(username, uuid, publicKey, callback){
     try {
         const user = new User({
             username,
+            displayName: username,
             uuid,
             publicKey
         });
@@ -129,11 +131,28 @@ async function createUser(username, uuid, publicKey, callback){
     }
 }
 
+async function setDisplayName(username, name, callback){
+    try {
+        const user = await User.findOneAndUpdate(
+            { username: username },
+            { $set: { displayName: name } },
+            { new: true } // Return the updated document after modification
+        );
+        if(!user){
+            callback(false);
+        }
+        callback(true);
+    } catch (e){
+        callback(false);
+    }
+}
+
 module.exports = {
     connectDB,
     loadUser,
     createUser,
     loadUserSettings,
     SaveOfflineMessages,
-    LoadOfflineMessages
+    LoadOfflineMessages,
+    setDisplayName
 }

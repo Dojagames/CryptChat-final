@@ -3,9 +3,9 @@ const cors = require('cors');
 const server = require('http').createServer();
 const { v4: uuidv4 } = require('uuid');
 
-const {connectDB, createUser, loadUser, loadUserSettings, SaveOfflineMessages, LoadOfflineMessages} =  require("./db.js")
+const {connectDB, createUser, loadUser, loadUserSettings, SaveOfflineMessages, LoadOfflineMessages, setDisplayName} =  require("./db.js")
 const {verifySignature} = require("./crypto");
-
+const {getUsernameFromSocketId} = require("./functions");
 
 
 const io = socketIo(server, {
@@ -14,6 +14,9 @@ const io = socketIo(server, {
         methods: ['GET', 'POST'], // Specify allowed methods
     },
 });
+
+
+const users = {}; // Store connected users { username: { socketId, publicKey } }
 
 
 io.on('connection', (socket) => {
@@ -45,6 +48,34 @@ io.on('connection', (socket) => {
             socket.emit("registered");
             console.log(`user: ${username} registered`);
         });
+    });
+
+    socket.on('setDisplayName', async (name) => {
+        const username = getUsernameFromSocketId(users, socket.id);
+        if(!username){
+            socket.emit("displayNameSet_failed", "error while setting Display Name");
+            return;
+        }
+        await setDisplayName(username, name, (done) => {
+            if(!done){
+                socket.emit("displayNameSet_failed", "error while setting displayname");
+                return;
+            }
+            socket.emit("displayNameSet", (name));
+        });
+    });
+
+    socket.on('addUser', async (username) => {
+        const user = await loadUser(username);
+        if(!user){
+            socket.emit("addUser_failed", "user not found");
+            return;
+        }
+
+        socket.emit('receivedUser', user);
+
+        console.log(`user: ${getUsernameFromSocketId(users, socket.id)} added user: ${username}`);
+
     });
 
     socket.on('login', async (data) => {

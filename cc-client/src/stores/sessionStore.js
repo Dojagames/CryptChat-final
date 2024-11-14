@@ -6,7 +6,7 @@ export const useSession = defineStore(
   () => {
     const session = ref(false)
 
-    function login(callback) {
+    function login() {
       // Check if login is valid
       session.value = true
     }
@@ -16,8 +16,10 @@ export const useSession = defineStore(
     }
 
     return { session, login, logout }
-  },
-  {
-    persist: true
+  }, {
+    persist: {
+      enabled: true,
+      storage: window.localStorage,
+    }
   }
 )

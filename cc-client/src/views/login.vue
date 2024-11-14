@@ -3,12 +3,26 @@ import {ref} from "vue";
 
 import socket from '../socket.js';
 
+import {useProfileStore} from "@/stores/profileStore.js";
+import {useSession} from '@/stores/sessionStore.js';
+
+
+const profileStore = useProfileStore();
+const session = useSession();
+
+
 import EC from 'elliptic';
 const ec = new EC.ec('secp256k1'); // Use the secp256k1 elliptic curve
 let username = ref("");
+let displayName = ref("");
 
 let keyPair;
 let publicKey;
+
+let registering = ref(true);
+
+
+
 
 function register(name){
     console.log(name);
@@ -25,9 +39,27 @@ function register(name){
     }
 }
 
+function setDisplayName(name){
+  socket.emit('setDisplayName', (name));
+
+  session.login();
+}
+
+socket.on('displayNameSet', (name) => {
+  session.login();
+  profileStore.setUsername(name);
+});
+
+
 socket.on('registered', () => {
   //save UserObj
-  //redirect to chat
+  profileStore.setProfile({
+    username: username,
+    displayName: username,
+    keyPair: keyPair,
+    publicKey: publicKey,
+  });
+  registering = false;
 });
 
 socket.on('register_failed', (reason) => {
@@ -43,9 +75,13 @@ socket.on('register_failed', (reason) => {
 </script>
 
 <template>
-  <div class="login-container">
+  <div class="login-container" v-if="registering">
     <input class="login-input-name" placeholder="Username" type="text" v-model="username">
     <button class="login-button" @click="register(username)">Register</button>
+  </div>
+  <div class="login-container" v-else>
+    <input class="login-input-name" placeholder="Displayname" type="text" v-model="displayName">
+    <button class="login-button" @click="setDisplayName(displayName)">Register</button>/
   </div>
 </template>
 

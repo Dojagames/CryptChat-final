@@ -1,4 +1,5 @@
 <script setup>
+
 import ChatPreview from "@/components/chat-preview.vue";
 import {useSession} from '@/stores/sessionStore.js';
 import {useUsersStore} from "@/stores/usersStore.js";
@@ -7,6 +8,12 @@ const userStore = useUsersStore();
 
 
 const chats = userStore.users
+
+
+
+
+
+
 
 userStore.addUser({
   username: "John",
@@ -34,5 +41,4 @@ console.log(chats);
 </template>
 
 <style scoped>
-
 </style>

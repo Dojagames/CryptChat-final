@@ -15,8 +15,8 @@
     top: 0;
     background-color: var(--secondary-background-color);
     width: 100%;
-    height: 8vh;
-    min-height: 8vh;
+    height: 6vh;
+    min-height: 6vh;
   }
 
   h1{

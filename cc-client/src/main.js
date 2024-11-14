@@ -11,10 +11,9 @@ const app = createApp(App)
 
 const pinia = createPinia()
 app.use(pinia)
-pinia.use(piniaPluginPersistedstate({
-  storage: window.localStorage,
-}))
+pinia.use(piniaPluginPersistedstate)
 app.use(router)
 
 app.mount('#app')
 
+//load Stores
