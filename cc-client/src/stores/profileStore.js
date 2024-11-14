@@ -15,7 +15,12 @@ export const useProfileStore = defineStore(
       profile.value.username = username;
     }
 
-    return {profile, setProfile, setUsername};
+    function setDisplayName(displayName) {
+      if(displayName && profile.value)
+        profile.value.displayName = displayName;
+    }
+
+    return {profile, setProfile, setUsername, setDisplayName};
   },{
     persist: {
       enabled: true,

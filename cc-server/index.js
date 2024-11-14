@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
     // Handle user registration with public keys generated on the client side
     socket.on('register', async (data) => {
         const { username, publicKey } = data;
-        console.log(username + "tries to register");
+        console.log(username + " tries to register");
 
         let user = await loadUser(username);
         if(user){
@@ -81,17 +81,20 @@ io.on('connection', (socket) => {
     socket.on('login', async (data) => {
         const { message, signature, username} = data;
         if(users[username]){
+            console.log("already logged in");
             socket.emit("login_failed", "already logged in");
             return;
         }
 
         let user = await loadUser(username);
         if(!user){
+            console.log("user does not exist");
             socket.emit("login_failed", "user does not exist");
             return;
         }
 //
         if(!verifySignature(signature, message, user.publicKey)){
+            console.log("private Key is not valid");
             socket.emit("login_failed", "private Key is not valid");
             return;
         }

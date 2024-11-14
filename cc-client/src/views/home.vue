@@ -11,6 +11,7 @@ const socket = inject('socket');
 
 let addUserModal = ref(false);
 let usernameToAdd = ref("");
+let error = ref(null);
 
 function addUser(username){
   socket.emit("addUser", (username));
@@ -18,7 +19,11 @@ function addUser(username){
 
 socket.on('receivedUser', (user) => {
   userStore.addUser(user);
-  addUserModal = false;
+  addUserModal.value = false;
+});
+
+socket.on('addUser_failed', (reason) => {
+  error.value = reason;
 });
 </script>
 
@@ -34,6 +39,7 @@ socket.on('receivedUser', (user) => {
     <div id="addUserModal" v-if="addUserModal">
       <input id="addUserModalInput" type="text" placeholder="add user" @keyup.enter="addUser(usernameToAdd)" v-model="usernameToAdd">
       <button id="addUserModalButton" @click="addUser(usernameToAdd)">Add</button>
+      <p v-if="error" id="addUserModalError">{{ error }}</p>
     </div>
 
     <!-- userNotFoundModal -->

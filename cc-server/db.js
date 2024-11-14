@@ -107,7 +107,6 @@ async function LoadOfflineMessages(username){
     }
 }
 
-
 async function createUser(username, uuid, publicKey, callback){
     try {
         const user = new User({

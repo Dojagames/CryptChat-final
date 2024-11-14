@@ -9,7 +9,12 @@ export const useUsersStore = defineStore(
 
 
     function addUser(user) {
+      if(users.value[user.username]) {
+        console.log("could not add user");
+        return;
+      }
       users.value[user.username] = user;
+      console.log("added user");
     }
 
     function updateUser(name, updatedUser, callback) {

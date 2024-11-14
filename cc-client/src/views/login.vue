@@ -24,6 +24,7 @@ const error = ref(null);
 // Non-reactive variables for the key pair
 let keyPair;
 let publicKey;
+let privateKey;
 
 function register(name) {
   if (!name) {
@@ -35,6 +36,7 @@ function register(name) {
 
   // Generate key pair
   keyPair = ec.genKeyPair();
+  privateKey = keyPair.getPrivate('hex');
   publicKey = keyPair.getPublic('hex');
 
   // Emit register event with the user data
@@ -57,15 +59,15 @@ function setDisplayName(name) {
 // Socket event listeners
 socket.on('displayNameSet', (name) => {
   session.login();
-  profileStore.setUsername(name);
-  router.push('/chat');
+  profileStore.setDisplayName(name);
+  router.push('/');
 });
 
 socket.on('registered', () => {
   profileStore.setProfile({
     username: username.value,
-    displayName: username.value,
-    keyPair: keyPair,
+    displayName: displayName.value,
+    privateKey: privateKey,
     publicKey: publicKey,
   });
   registering.value = false;
