@@ -4,16 +4,35 @@ import Message from "@/components/message.vue";
 import ChatFooter from "@/components/chat-footer.vue";
 
 import { useRoute } from 'vue-router';
-import { ref, onMounted, nextTick } from 'vue';
+import {ref, onMounted, nextTick, inject} from 'vue';
+
+
 import {useUsersStore} from "@/stores/usersStore.js";
+import {useProfileStore} from "@/stores/profileStore.js";
+
+const socket = inject('socket');
+const ec = inject('ec');
 
 const route = useRoute();
 const userStore = useUsersStore();
 const users = userStore.users;
 
+const profile = useProfileStore();
+
+const privateKeyImport = profile.profile.privateKey;
+console.log(privateKeyImport);
+let privateKey;
+let keyPair;
+if(privateKeyImport){
+  keyPair = ec.keyFromPrivate(privateKeyImport, 'hex');
+}
+
 const chat = users[route.params.user] || {username: "test"}; // use for header
 
 const chatContainer = ref(null);
+
+
+
 
 
 var dateToCheck;
@@ -168,6 +187,72 @@ function call(){
 function openSettings(){
   console.log("open settings");
 }
+
+async function sendMsg(msg){
+  const encrypted = await EncryptMsg(msg);
+  if(encrypted){
+    const signature = keyPair.sign(encrypted).toDER('hex');
+    socket.emit('send_message', {
+      to: chat.username,
+      from: profile.profile.username,
+      message: encrypted,
+      signature,
+    });
+    console.log("sent msg");
+  } else {
+    alert("couldnt encrypt msg");
+  }
+}
+
+async function EncryptMsg(msg){
+  const publicKeyHex = chat.publicKey;
+  return JSON.stringify(await encryptMessage(publicKeyHex, msg));
+}
+
+async function encryptMessage(publicKeyHex, message) {
+  const aesKey = await deriveSharedSecret(keyPair.getPrivate('hex'), publicKeyHex);
+
+  // Encrypt the message using AES-GCM
+  const iv = crypto.getRandomValues(new Uint8Array(12)); // AES-GCM requires a 12-byte IV
+  const encodedMessage = new TextEncoder().encode(message);
+  const encryptedBuffer = await crypto.subtle.encrypt(
+    {
+      name: 'AES-GCM',
+      iv: iv,
+    },
+    aesKey,
+    encodedMessage
+  );
+
+  return {
+    iv: Array.from(iv).map((b) => b.toString(16).padStart(2, '0')).join(''),
+    encryptedMessage: Array.from(new Uint8Array(encryptedBuffer))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join(''),
+  };
+}
+
+async function deriveSharedSecret(privateKeyHex, otherPublicKeyHex) {
+  try {
+    const privateKey = ec.keyFromPrivate(privateKeyHex, 'hex');
+    const otherPublicKey = ec.keyFromPublic(otherPublicKeyHex, 'hex');
+
+    // Derive shared secret using ECDH
+    const sharedSecret = privateKey.derive(otherPublicKey.getPublic());
+    // Ensure ArrayBuffer conversion
+    const sharedSecretArray = Uint8Array.from(sharedSecret.toString(16).match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+    // Hash the shared secret
+    const hashBuffer = await crypto.subtle.digest('SHA-256', sharedSecretArray);
+
+    // Cache the hashed shared secret
+    return await crypto.subtle.importKey('raw', hashBuffer, 'AES-GCM', false, ['encrypt', 'decrypt']);
+  } catch (error) {
+    console.error('Error in deriveSharedSecret:', error);
+    throw error;
+  }
+}
+
 </script>
 <!-- wrap in div with flex and  -->
 <template>
@@ -179,7 +264,7 @@ function openSettings(){
                 :newDate="(index !== 0) ? (messages[index - 1].date !== messages[index].date) : true"
       />
     </div>
-    <ChatFooter @changedHeight="scrollToBottom"/>
+    <ChatFooter @changedHeight="scrollToBottom" @sendMsg="sendMsg"/>
   </div>
 
   <div id="profile-modal" v-if="showProfileModal">

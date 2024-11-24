@@ -2,7 +2,6 @@
 import HomeHeader from "@/components/home-header.vue";
 import HomeChat from "@/components/home-chat-list.vue";
 import {ref, inject} from "vue";
-
 import {useUsersStore} from "@/stores/usersStore.js";
 
 const userStore = useUsersStore();
@@ -25,6 +24,9 @@ socket.on('receivedUser', (user) => {
 socket.on('addUser_failed', (reason) => {
   error.value = reason;
 });
+
+
+
 </script>
 
 <template>
@@ -37,6 +39,7 @@ socket.on('addUser_failed', (reason) => {
     </div>
 
     <div id="addUserModal" v-if="addUserModal">
+      <p style="position: absolute; right: 1vw; top: -1.5vh; font-size: 1.5rem; cursor: pointer;" @click="addUserModal = false">x</p>
       <input id="addUserModalInput" type="text" placeholder="add user" @keyup.enter="addUser(usernameToAdd)" v-model="usernameToAdd">
       <button id="addUserModalButton" @click="addUser(usernameToAdd)">Add</button>
       <p v-if="error" id="addUserModalError">{{ error }}</p>

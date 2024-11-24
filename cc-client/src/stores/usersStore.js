@@ -18,18 +18,23 @@ export const useUsersStore = defineStore(
     }
 
     function updateUser(name, updatedUser, callback) {
-      const userIndex = users.value.findIndex((e) => e.name === name);
 
-      if (userIndex !== -1) {
-        users.value[userIndex] = {
-          ...users.value[userIndex], // Keep existing properties
+      if (users.value[name]) {
+        users.value[name] = {
+          ...users.value[name], // Keep existing properties
           ...updatedUser // Overwrite with updated properties
         };
-        callback(null)
+        if(callback){
+          callback(null);
+        }
       } else {
-        callback("user not found");
+        if(callback){
+          callback("user not found");
+        }
       }
     }
+
+
 
     return {users, addUser, updateUser};
   },

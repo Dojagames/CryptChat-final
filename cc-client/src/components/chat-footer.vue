@@ -1,17 +1,26 @@
 <script setup>
-const emit = defineEmits(['changedHeight'])
+import {ref} from "vue";
+
+const emit = defineEmits(['changedHeight', 'sendMsg'])
+
 function resizeInput(e){
   const element = e.target;
   element.style.height = 'auto';
   element.style.height = `calc(${element.scrollHeight}px - 1.2rem )`;
   emit('changedHeight');
 }
+
+let msgTxt = ref("");
+
+async function sendMsg(txt) {
+  emit('sendMsg', txt);
+}
 </script>
 
 <template>
 <div class="chat-footer-container">
-  <textarea id="message-input" placeholder="Type a message..." @input="resizeInput($event)" rows="1"></textarea>
-  <button id="send-button">Send</button>
+  <textarea id="message-input" placeholder="Type a message..." @input="resizeInput($event)" rows="1" v-model="msgTxt"></textarea>
+  <button id="send-button" @click="sendMsg(msgTxt)">Send</button>
 </div>
 </template>
 

@@ -12,9 +12,7 @@ const session = useSession();
 // Inject socket (assuming it was provided by a parent component or globally)
 const socket = inject('socket');
 
-import EC from 'elliptic';
-const ec = new EC.ec('secp256k1'); // Use the secp256k1 elliptic curve
-
+const ec = inject('ec');
 // Reactive variables
 const username = ref("");
 const displayName = ref("");

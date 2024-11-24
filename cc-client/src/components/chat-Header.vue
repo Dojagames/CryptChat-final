@@ -50,7 +50,7 @@ watch(searchText, (newValue, oldValue) => {
     <img @click="exitChat" class="chat-exit" src="../assets/icons/back.png" alt="back">
     <img @click="openProfile()" id="chat-header-icon" src="https://cdn.britannica.com/98/214598-050-9879F2FA/giant-sequoia-tree-Sequoia-National-Park-California.jpg" :src="chat.pb" alt="pb">
     <p @click="openProfile()" id="chat-header-name">
-      {{chat.username}}
+      {{chat.displayName}}
     </p>
     <div id="chat-header-icon-wrapper">
       <img @click="openSearch()" src="../assets/icons/magnifying-glass.png" alt="search">

@@ -72,6 +72,9 @@ io.on('connection', (socket) => {
             return;
         }
 
+        delete user._id;
+        delete user.uuid;
+
         socket.emit('receivedUser', user);
 
         console.log(`user: ${getUsernameFromSocketId(users, socket.id)} added user: ${username}`);
@@ -186,7 +189,17 @@ io.on('connection', (socket) => {
             socket.emit("receive_public_key", {username, publicKey: user.publicKey});
             console.log("key send");
         }
-    })
+    });
+
+    socket.on('getUserInfo', async (username) => {
+        const user = await loadUser(username);
+        if(user){
+            delete user._id;
+            delete user.uuid;
+            socket.emit("receive_user_info", {username, user});
+            console.log("user info send");
+        }
+    });
 
     // Handle user disconnection
     socket.on('disconnect', () => {
